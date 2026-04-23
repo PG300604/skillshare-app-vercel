@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>frontend</title>
+  </head>
+  <body>
+    <script>
+      window.addEventListener('error', function(event) {
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = 'position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: black; color: red; z-index: 99999; padding: 20px; font-family: monospace; font-size: 14px;';
+        errorDiv.innerHTML = '<h3>React Fatal Error:</h3>' + 
+                             '<b>Message:</b> ' + event.message + '<br/>' +
+                             '<b>File:</b> ' + event.filename + ':' + event.lineno + '<br/><br/>' +
+                             '<b>Stack:</b><pre>' + (event.error && event.error.stack ? event.error.stack : 'N/A') + '</pre>';
+        document.body.appendChild(errorDiv);
+      });
+      console.error = function(...args) {
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = 'position: absolute; bottom: 0; left: 0; width: 100vw; background: darkred; color: white; z-index: 99998; padding: 20px; font-family: monospace; font-size: 14px;';
+        errorDiv.innerHTML = '<h3>Console Error Ocurred:</h3>' + args.join(' ');
+        document.body.appendChild(errorDiv);
+      };
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

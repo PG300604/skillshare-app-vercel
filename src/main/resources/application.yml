@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:skillshare;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: sa
+    password: 
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    defer-datasource-initialization: true
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+supabase:
+  jwt:
+    secret: 25A27CF4-221F-423C-8ADE-7602D876B2E4
