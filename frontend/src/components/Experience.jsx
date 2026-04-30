@@ -13,6 +13,10 @@ export function Experience() {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
+    document.title = "SkillShare | Discover";
+  }, []);
+
+  useEffect(() => {
     async function loadSession() {
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);

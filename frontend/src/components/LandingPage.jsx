@@ -5,6 +5,10 @@ export function LandingPage() {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
+    document.title = "SkillShare | Welcome to the Hub";
+  }, []);
+
+  useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
