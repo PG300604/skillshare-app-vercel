@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <defs>
-    <linearGradient id="warmSunset" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#F56888" />
-      <stop offset="50%" stop-color="#E76F51" />
-      <stop offset="100%" stop-color="#FFC39D" />
-    </linearGradient>
-  </defs>
-  <rect width="100" height="100" rx="24" fill="url(#warmSunset)"/>
-  <path d="M50 25 L75 40 L75 70 L50 85 L25 70 L25 40 Z" fill="none" stroke="white" stroke-width="8" stroke-linejoin="round" />
-  <circle cx="50" cy="55" r="12" fill="white" />
-  <circle cx="50" cy="25" r="8" fill="white" />
-  <circle cx="25" cy="70" r="8" fill="white" />
-  <circle cx="75" cy="70" r="8" fill="white" />
+  <rect width="100" height="100" rx="20" fill="#12121e" />
+  <text 
+    x="50%" 
+    y="55%" 
+    dominant-baseline="middle" 
+    text-anchor="middle" 
+    font-family="'Plus Jakarta Sans', sans-serif" 
+    font-size="60" 
+    font-weight="900" 
+    letter-spacing="-2"
+  >
+    <tspan fill="#ffffff">S</tspan><tspan fill="#34d399">S</tspan>
+  </text>
 </svg>
