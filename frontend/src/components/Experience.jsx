@@ -32,26 +32,36 @@ export function Experience() {
     }
 
     try {
-      // Fetch all profiles except the current user
-      const { data } = await supabase
-        .from('profiles')
-        .select('*')
-        .neq('id', currentSession.user.id);
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      const response = await fetch(`${apiUrl}/api/matches/discover`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${currentSession.access_token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
+      
+      const data = await response.json();
       
       if (data) {
         const formattedDeck = data.map(u => ({
           id: u.id,
-          name: u.name || "A Creator",
-          role: u.looking_for ? `Looking for ${u.looking_for}` : 'Collaborator',
+          name: u.fullName || u.username || "A Creator",
+          role: 'Collaborator', // Add looking_for to User model later if needed
           location: 'Global',
-          skills: u.skills || ['Creator'],
+          skills: u.skills ? u.skills.map(s => s.skillName) : ['Creator'],
+          tags: u.tags || [],
           match: 85 + Math.floor(Math.random() * 10),
           avatar: "🧑‍💻",
         }));
         setDeck(formattedDeck);
       }
     } catch (err) {
-      console.error("Failed to fetch from supabase:", err);
+      console.error("Failed to fetch from Spring Boot API:", err);
     } finally {
       setLoading(false);
     }
@@ -62,12 +72,22 @@ export function Experience() {
     
     if (direction === "right" && swipedUser && session) {
       try {
+        // Insert the current user's right swipe
         await supabase
           .from("matches")
           .insert([{ user_id: session.user.id, target_id: swipedUser.id, direction: 'right' }]);
 
-        const mutualMatchTriggered = Math.random() > 0.3; 
-        if (mutualMatchTriggered) {
+        // Check for a mutual match: Did the target user already swipe right on us?
+        const { data: mutualSwipe } = await supabase
+          .from("matches")
+          .select("id")
+          .eq("user_id", swipedUser.id)
+          .eq("target_id", session.user.id)
+          .eq("direction", "right")
+          .maybeSingle();
+
+        if (mutualSwipe) {
+          // It's a real match!
           setTimeout(() => setMatchUser(swipedUser), 300); 
         }
       } catch (err) {
