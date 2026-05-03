@@ -31,8 +31,6 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // Allow H2 console for local dev (requires disabling frame options too)
                 .requestMatchers("/h2-console/**").permitAll()
-                // TEMPORARY WHITELIST for UI testing without auth token
-                .requestMatchers("/api/matches/**").permitAll()
                 // All other endpoints must be authenticated via Supabase JWT
                 .anyRequest().authenticated()
             )
@@ -54,7 +52,11 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        configuration.setAllowedOrigins(Arrays.asList(
+            "http://localhost:5173", 
+            "https://skillshare-app-vercel.vercel.app",
+            "https://skillshare-app-vercel-xv9i.vercel.app"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
