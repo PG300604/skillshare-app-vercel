@@ -17,3 +17,7 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: https://fsvidhqsmovodluunupe.supabase.co/auth/v1/.well-known/jwks.json
+
+logging:
+  level:
+    org.springframework.security: DEBUG
