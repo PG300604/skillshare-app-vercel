@@ -118,7 +118,7 @@ export function SetupProfile() {
       }
 
       // Navigate to Dashboard
-      navigate('/home');
+      window.location.href = '/home';
 
     } catch (error) {
       console.error("Error saving profile:", error);
