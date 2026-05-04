@@ -32,12 +32,20 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(Customizer.withDefaults())
+                .jwt(jwt -> jwt.decoder(jwtDecoder()))
             )
             // Allow frames for H2 console
             .headers(headers -> headers.frameOptions(frame -> frame.disable()));
             
         return http.build();
+    }
+
+    @Bean
+    public org.springframework.security.oauth2.jwt.JwtDecoder jwtDecoder() {
+        return org.springframework.security.oauth2.jwt.NimbusJwtDecoder
+                .withJwkSetUri("https://fsvidhqsmovodluunupe.supabase.co/auth/v1/.well-known/jwks.json")
+                .jwsAlgorithm(org.springframework.security.oauth2.jose.jws.SignatureAlgorithm.ES256)
+                .build();
     }
 
     @Bean
