@@ -12,9 +12,11 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-supabase:
-  jwt:
-    secret: ${SUPABASE_JWT_SECRET:25A27CF4-221F-423C-8ADE-7602D876B2E4}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://fsvidhqsmovodluunupe.supabase.co/auth/v1/.well-known/jwks.json
 
 logging:
   level:
