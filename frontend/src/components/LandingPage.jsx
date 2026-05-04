@@ -193,17 +193,18 @@ export function LandingPage() {
 const styles = {
   root: {
     width: "100vw",
-    height: "100vh",
+    minHeight: "100vh",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     background: "var(--canvas-black)",
-    overflow: "hidden",
+    overflowY: "auto",
+    overflowX: "hidden",
   },
   container: {
     width: "100%",
     maxWidth: "1280px",
-    height: "100%",
+    minHeight: "100vh",
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
