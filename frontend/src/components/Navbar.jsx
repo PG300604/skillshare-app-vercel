@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 
 export function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -80,7 +81,7 @@ export function Navbar() {
                      key={user.id} 
                      style={styles.searchItem}
                      onClick={() => {
-                       alert(`Viewing ${user.full_name}'s profile is coming soon!`);
+                       navigate(`/user/${user.id}`);
                        setSearchQuery('');
                      }}
                    >

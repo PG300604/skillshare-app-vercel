@@ -8,6 +8,7 @@ import { Matches } from "./pages/Matches";
 import { Messages } from "./pages/Messages";
 import { Profile } from "./pages/Profile";
 import { SetupProfile } from "./pages/SetupProfile";
+import { UserProfile } from "./pages/UserProfile";
 import { supabase } from "./supabaseClient";
 
 function App() {
@@ -78,6 +79,7 @@ function App() {
         <Route path="/matches" element={<Matches />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/user/:id" element={<UserProfile />} />
         <Route path="/setup" element={<Navigate to="/home" replace />} />
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>

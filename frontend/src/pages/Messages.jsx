@@ -20,18 +20,28 @@ export function Messages() {
       if (!session) return;
       setSession(session);
 
-      const { data: matchRecords } = await supabase
+      const { data: mySwipes } = await supabase
         .from('matches')
         .select('target_id')
         .eq('user_id', session.user.id)
         .eq('direction', 'right');
 
-      if (matchRecords && matchRecords.length > 0) {
-        const targetIds = matchRecords.map(m => m.target_id);
+      const { data: theirSwipes } = await supabase
+        .from('matches')
+        .select('user_id')
+        .eq('target_id', session.user.id)
+        .eq('direction', 'right');
+
+      const myTargets = mySwipes?.map(m => m.target_id) || [];
+      const whoSwipedMe = theirSwipes?.map(m => m.user_id) || [];
+      
+      const mutualTargetIds = myTargets.filter(id => whoSwipedMe.includes(id));
+
+      if (mutualTargetIds.length > 0) {
         const { data: profiles } = await supabase
           .from('profiles')
           .select('*')
-          .in('id', targetIds);
+          .in('id', mutualTargetIds);
         
         if (profiles) {
           const formattedConvos = profiles.map(p => ({
