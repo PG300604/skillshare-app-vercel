@@ -3,6 +3,29 @@ import { supabase } from "../supabaseClient";
 
 export function LandingPage() {
   const [session, setSession] = useState(null);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState(null);
+
+  const handleEmailAuth = async (e) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthError(null);
+    let error;
+    if (isSignUp) {
+      const res = await supabase.auth.signUp({ email, password });
+      error = res.error;
+    } else {
+      const res = await supabase.auth.signInWithPassword({ email, password });
+      error = res.error;
+    }
+    if (error) {
+      setAuthError(error.message);
+    }
+    setAuthLoading(false);
+  };
 
   useEffect(() => {
     document.title = "SkillShare | Welcome to the Hub";
@@ -40,6 +63,41 @@ export function LandingPage() {
           <div style={styles.authBox}>
             {!session ? (
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                <form onSubmit={handleEmailAuth} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  <input 
+                    type="email" 
+                    placeholder="Email" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    style={styles.input} 
+                    required 
+                  />
+                  <input 
+                    type="password" 
+                    placeholder="Password" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    style={styles.input} 
+                    required 
+                  />
+                  {authError && <div style={{color: 'var(--red-error)', fontSize: '14px'}}>{authError}</div>}
+                  <button type="submit" disabled={authLoading} className="verge-button" style={{ width: "100%", background: "var(--jelly-mint)", color: "var(--absolute-black)" }}>
+                    {authLoading ? "Loading..." : isSignUp ? "Sign Up with Email" : "Log In with Email"}
+                  </button>
+                  <div 
+                    style={{ textAlign: "center", color: "var(--hazard-white)", fontSize: "14px", cursor: "pointer", textDecoration: "underline" }}
+                    onClick={() => setIsSignUp(!isSignUp)}
+                  >
+                    {isSignUp ? "Already have an account? Log In" : "Need an account? Sign Up"}
+                  </div>
+                </form>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "8px 0" }}>
+                  <div style={{ flex: 1, height: "1px", background: "var(--hazard-white)", opacity: 0.2 }} />
+                  <div style={{ color: "var(--hazard-white)", opacity: 0.5, fontSize: "12px" }}>OR</div>
+                  <div style={{ flex: 1, height: "1px", background: "var(--hazard-white)", opacity: 0.2 }} />
+                </div>
+
                 <button
                   onClick={() => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })}
                   className="verge-button"
@@ -48,6 +106,14 @@ export function LandingPage() {
                   Continue with Google
                 </button>
                 
+                <button
+                  onClick={() => supabase.auth.signInWithOAuth({ provider: 'github', options: { redirectTo: window.location.origin } })}
+                  className="verge-button"
+                  style={{ width: "100%", background: "#333", color: "var(--hazard-white)" }}
+                >
+                  Continue with GitHub
+                </button>
+
                 <button
                   onClick={() => supabase.auth.signInWithOAuth({ provider: 'linkedin_oidc', options: { redirectTo: window.location.origin } })}
                   className="verge-button"
@@ -216,5 +282,15 @@ const styles = {
     height: "380px",
     background: "var(--canvas-black)",
     padding: "24px",
+  },
+  input: {
+    padding: "12px 16px",
+    borderRadius: "8px",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    background: "rgba(255, 255, 255, 0.05)",
+    color: "var(--hazard-white)",
+    fontSize: "16px",
+    outline: "none",
+    transition: "border-color 0.2s",
   }
 };

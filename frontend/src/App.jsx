@@ -7,29 +7,45 @@ import { Explore } from "./pages/Explore";
 import { Matches } from "./pages/Matches";
 import { Messages } from "./pages/Messages";
 import { Profile } from "./pages/Profile";
+import { SetupProfile } from "./pages/SetupProfile";
 import { supabase } from "./supabaseClient";
 
 function App() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [profileExists, setProfileExists] = useState(null);
   const location = useLocation();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    const checkSessionAndProfile = async (currentSession) => {
+      setSession(currentSession);
+      if (currentSession) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("id", currentSession.user.id)
+          .maybeSingle();
+        setProfileExists(!!data);
+      } else {
+        setProfileExists(null);
+      }
       setLoading(false);
+    };
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      checkSessionAndProfile(session);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+      checkSessionAndProfile(session);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  if (loading) {
+  if (loading || (session && profileExists === null)) {
     return <div style={{ background: "#12121e", height: "100vh" }} />;
   }
 
@@ -42,7 +58,17 @@ function App() {
     );
   }
 
-  // We are authenticated
+  // Authenticated but no profile -> Force Setup
+  if (!profileExists) {
+    return (
+      <Routes>
+        <Route path="/setup" element={<SetupProfile />} />
+        <Route path="*" element={<Navigate to="/setup" replace />} />
+      </Routes>
+    );
+  }
+
+  // Authenticated and Profile exists
   return (
     <div style={{ margin: 0, padding: 0 }}>
       <Routes>
@@ -52,6 +78,7 @@ function App() {
         <Route path="/matches" element={<Matches />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/setup" element={<Navigate to="/home" replace />} />
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
       <Navbar />
