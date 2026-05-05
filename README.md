@@ -23,7 +23,7 @@ Think of it as a dating app, but instead of romance, you're finding your next pr
 - **Profile setup flow** — Onboarding that gates the app until profile is complete
 - **Activity timeline** — Home feed showing your recent matches and activity
 - **Dockerized backend** — Multi-stage Docker build for clean, lightweight deployment
-- **Deployed on Vercel** — Frontend live at [skillshare-app-vercel.vercel.app](https://skillshare-app-vercel.vercel.app)
+- **Deployed on Vercel** — Frontend live at [skillshare-app-vercel.vercel.app](https://skillshare-app-vercel-xv9i.vercel.app/)
 
 ---
 
