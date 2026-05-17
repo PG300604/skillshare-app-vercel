@@ -21,7 +21,11 @@ public class MatchService {
 
     public List<User> findCollaborators(User currentUser, double initialRadius) {
         if (currentUser.getSkills() == null || currentUser.getSkills().isEmpty()) {
-            return List.of();
+            // Fallback: If user hasn't set up skills, return up to 50 featured profiles
+            return userRepository.findAll().stream()
+                    .filter(u -> !u.getId().equals(currentUser.getId()))
+                    .limit(50)
+                    .collect(Collectors.toList());
         }
 
         List<String> userSkillNames = currentUser.getSkills().stream()
@@ -53,10 +57,10 @@ public class MatchService {
         if (matches.isEmpty()) {
             List<User> globalMatches = new java.util.ArrayList<>(candidates);
             if (globalMatches.isEmpty()) {
-                 // No one globally shares a skill, fetch random 5
+                 // No one globally shares a skill, fetch random 50
                  return userRepository.findAll().stream()
                          .filter(u -> !u.getId().equals(currentUser.getId()))
-                         .limit(5)
+                         .limit(50)
                          .collect(Collectors.toList());
             }
             // Sort global candidates by proficiency, ignoring distance filter
@@ -65,7 +69,7 @@ public class MatchService {
                 int score2 = getMaxSharedProficiencyScore(u2, userSkillNames);
                 return Integer.compare(score2, score1);
             });
-            return globalMatches.stream().limit(5).collect(Collectors.toList());
+            return globalMatches.stream().limit(50).collect(Collectors.toList());
         }
 
         // Sort local results by highest proficiency level in the shared skill
