@@ -9,12 +9,14 @@ import { Messages } from "./pages/Messages";
 import { Profile } from "./pages/Profile";
 import { SetupProfile } from "./pages/SetupProfile";
 import { UserProfile } from "./pages/UserProfile";
+import { TermsModal } from "./components/TermsModal";
 import { supabase } from "./supabaseClient";
 
 function App() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [profileExists, setProfileExists] = useState(null);
+  const [termsAccepted, setTermsAccepted] = useState(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -23,12 +25,16 @@ function App() {
       if (currentSession) {
         const { data } = await supabase
           .from("profiles")
-          .select("id")
+          .select("id, terms_accepted")
           .eq("id", currentSession.user.id)
           .maybeSingle();
         setProfileExists(!!data);
+        if (data) {
+          setTermsAccepted(data.terms_accepted);
+        }
       } else {
         setProfileExists(null);
+        setTermsAccepted(null);
       }
       setLoading(false);
     };
@@ -72,6 +78,14 @@ function App() {
   // Authenticated and Profile exists
   return (
     <div style={{ margin: 0, padding: 0 }}>
+      {/* Terms & Conditions Security Gate */}
+      {termsAccepted === false && (
+        <TermsModal 
+          userId={session.user.id} 
+          onAccept={() => setTermsAccepted(true)} 
+        />
+      )}
+
       <Routes>
         <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="/home" element={<Home />} />

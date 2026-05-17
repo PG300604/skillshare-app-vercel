@@ -18,6 +18,8 @@ export function Messages() {
   const [fileType, setFileType] = useState('image/*');
   const [showPollModal, setShowPollModal] = useState(false);
   const [showEventModal, setShowEventModal] = useState(false);
+  const [showStickerModal, setShowStickerModal] = useState(false);
+  const dummyStickers = ["😎", "🔥", "🚀", "💡", "🎉", "🤝", "💻", "✨", "💯", "🙌", "👋", "❤️"];
   const [pollQuestion, setPollQuestion] = useState("");
   const [pollOptions, setPollOptions] = useState("");
   const [eventTitle, setEventTitle] = useState("");
@@ -238,10 +240,9 @@ export function Messages() {
     { id: 'photo', label: 'Photos & videos', icon: ImageIcon, color: '#007bfc' },
     { id: 'camera', label: 'Camera', icon: Camera, color: '#ff2e74' },
     { id: 'audio', label: 'Audio', icon: Headphones, color: '#ff8a00' },
-    { id: 'contact', label: 'Contact', icon: User, color: '#009de2' },
     { id: 'poll', label: 'Poll', icon: List, color: '#00bfa5' },
     { id: 'event', label: 'Event', icon: Calendar, color: '#889eb2' },
-    { id: 'sticker', label: 'New sticker', icon: Sticker, color: '#00e676' }
+    { id: 'sticker', label: 'Stickers', icon: Sticker, color: '#00e676' }
   ];
 
   return (
@@ -400,7 +401,7 @@ export function Messages() {
                             } else if (opt.id === 'event') {
                               setShowEventModal(true);
                             } else if (opt.id === 'sticker') {
-                              handleSendMessage('[STICKER]https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMThjczNsdDBwYnc2M24zbHVrcTFrbnYwaGVweWY5cmU0cnJyeTVkZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/MDxuzRvxF39V6/giphy.gif');
+                              setShowStickerModal(true);
                             } else {
                               alert("Coming soon!");
                             }
@@ -459,6 +460,49 @@ export function Messages() {
                   </button>
                 </div>
               </div>
+            <AnimatePresence>
+              {showStickerModal && (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  style={styles.modalOverlay}
+                  onClick={() => setShowStickerModal(false)}
+                >
+                  <motion.div 
+                    initial={{ scale: 0.9, y: 20 }}
+                    animate={{ scale: 1, y: 0 }}
+                    exit={{ scale: 0.9, y: 20 }}
+                    style={styles.modalContent}
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <div style={styles.modalHeader}>
+                      <h3 className="font-display" style={{ margin: 0, color: '#fff' }}>Send a Sticker</h3>
+                      <button style={styles.iconBtn} onClick={() => setShowStickerModal(false)}>
+                        <X size={20} color="var(--secondary-text)" />
+                      </button>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px', padding: '20px 0' }}>
+                      {dummyStickers.map((sticker, idx) => (
+                        <div 
+                          key={idx}
+                          style={{ fontSize: '40px', textAlign: 'center', cursor: 'pointer', transition: 'transform 0.2s', padding: '10px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)' }}
+                          onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'}
+                          onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                          onClick={() => {
+                            handleSendMessage(`[STICKER]${sticker}`);
+                            setShowStickerModal(false);
+                          }}
+                        >
+                          {sticker}
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {showPollModal && (
               <div style={styles.dragOverlay}>
                 <div style={{...styles.dragContent, background: '#202c33', padding: '24px', borderRadius: '16px', minWidth: '300px'}}>
