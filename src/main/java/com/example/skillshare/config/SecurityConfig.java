@@ -40,11 +40,13 @@ public class SecurityConfig {
         return http.build();
     }
 
+    @Value("${spring.security.oauth2.resourceserver.jwt.secret}")
+    private String jwtSecret;
+
     @Bean
     public org.springframework.security.oauth2.jwt.JwtDecoder jwtDecoder() {
         return org.springframework.security.oauth2.jwt.NimbusJwtDecoder
-                .withJwkSetUri("https://fsvidhqsmovodluunupe.supabase.co/auth/v1/.well-known/jwks.json")
-                .jwsAlgorithm(org.springframework.security.oauth2.jose.jws.SignatureAlgorithm.RS256)
+                .withSecretKey(new javax.crypto.spec.SecretKeySpec(jwtSecret.getBytes(), "HmacSHA256"))
                 .build();
     }
 
