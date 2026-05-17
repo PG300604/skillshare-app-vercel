@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { Send, Paperclip, Image as ImageIcon, X } from 'lucide-react';
+import { Send, Paperclip, Image as ImageIcon, X, File, Camera, Headphones, User, List, Calendar, Sticker } from 'lucide-react';
 
 export function Messages() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -14,6 +14,7 @@ export function Messages() {
   const [newMessage, setNewMessage] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -197,11 +198,22 @@ export function Messages() {
     return <span style={{ wordBreak: 'break-word' }}>{text}</span>;
   };
 
+  const attachmentOptions = [
+    { id: 'doc', label: 'Document', icon: File, color: '#7f66ff' },
+    { id: 'photo', label: 'Photos & videos', icon: ImageIcon, color: '#007bfc' },
+    { id: 'camera', label: 'Camera', icon: Camera, color: '#ff2e74' },
+    { id: 'audio', label: 'Audio', icon: Headphones, color: '#ff8a00' },
+    { id: 'contact', label: 'Contact', icon: User, color: '#009de2' },
+    { id: 'poll', label: 'Poll', icon: List, color: '#00bfa5' },
+    { id: 'event', label: 'Event', icon: Calendar, color: '#889eb2' },
+    { id: 'sticker', label: 'New sticker', icon: Sticker, color: '#00e676' }
+  ];
+
   return (
     <div style={styles.container}>
       <div style={styles.glassContainer}>
         {/* Sidebar */}
-        <div style={{...styles.sidebar, display: activeChat ? 'none' : 'flex', '@media (minWidth: 768px)': { display: 'flex' }}}>
+        <div className={`sidebar ${activeChat ? 'active-chat' : ''}`} style={styles.sidebar}>
           <div style={styles.sidebarHeader}>
             <h1 className="font-display" style={styles.title}>CHATS</h1>
           </div>
@@ -243,7 +255,8 @@ export function Messages() {
 
         {/* Chat Area */}
         <div 
-          style={{...styles.chatArea, display: activeChat ? 'flex' : 'none', '@media (minWidth: 768px)': { display: 'flex' }}}
+          className={`chat-area ${activeChat ? 'active-chat' : ''}`}
+          style={styles.chatArea}
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
           onDrop={onDrop}
@@ -321,12 +334,45 @@ export function Messages() {
                 <div ref={messagesEndRef} style={{height: '1px'}} />
               </div>
 
-              <div style={styles.chatInputArea}>
+              <div style={{...styles.chatInputArea, position: 'relative'}}>
+                <AnimatePresence>
+                  {showAttachmentMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                      transition={{ duration: 0.2 }}
+                      style={styles.attachmentMenu}
+                    >
+                      {attachmentOptions.map(opt => (
+                        <div 
+                          key={opt.id}
+                          style={styles.menuItem}
+                          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                          onClick={() => {
+                            if (opt.id === 'photo') {
+                              fileInputRef.current?.click();
+                            } else {
+                              alert("Coming soon!");
+                            }
+                            setShowAttachmentMenu(false);
+                          }}
+                        >
+                          <div style={{ color: opt.color }}>
+                            <opt.icon size={20} />
+                          </div>
+                          <span className="font-sans">{opt.label}</span>
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
                 <div style={styles.inputWrapper}>
                   <button 
                     style={styles.iconBtn} 
-                    onClick={() => fileInputRef.current?.click()}
-                    title="Attach Image"
+                    onClick={() => setShowAttachmentMenu(!showAttachmentMenu)}
+                    title="Attach"
                   >
                     <Paperclip size={20} color="var(--secondary-text)" />
                   </button>
@@ -377,6 +423,27 @@ export function Messages() {
           0%, 100% { transform: translateY(0) scale(1); }
           50% { transform: translateY(-20px) scale(1.05); }
         }
+        .sidebar {
+          display: flex;
+        }
+        .chat-area {
+          display: flex;
+        }
+        @media (max-width: 768px) {
+          .sidebar.active-chat {
+            display: none !important;
+          }
+          .chat-area.active-chat {
+            display: flex !important;
+          }
+          .chat-area:not(.active-chat) {
+            display: none !important;
+          }
+          .sidebar:not(.active-chat) {
+            width: 100% !important;
+            border-right: none !important;
+          }
+        }
       `}</style>
     </div>
   );
@@ -409,7 +476,6 @@ const styles = {
     width: '350px',
     minWidth: '300px',
     borderRight: '1px solid rgba(255, 255, 255, 0.05)',
-    display: 'flex',
     flexDirection: 'column',
     background: 'rgba(0, 0, 0, 0.2)',
   },
@@ -462,7 +528,6 @@ const styles = {
   },
   chatArea: {
     flex: 1,
-    display: 'flex',
     flexDirection: 'column',
     position: 'relative',
     background: 'rgba(0, 0, 0, 0.4)',
@@ -637,6 +702,29 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     background: 'rgba(60, 255, 208, 0.05)'
+  },
+  attachmentMenu: {
+    position: 'absolute',
+    bottom: '70px',
+    left: '24px',
+    background: '#233138',
+    borderRadius: '16px',
+    padding: '16px 0',
+    display: 'flex',
+    flexDirection: 'column',
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+    zIndex: 100,
+    width: '240px'
+  },
+  menuItem: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
+    padding: '12px 24px',
+    cursor: 'pointer',
+    color: '#d1d7db',
+    fontSize: '15px',
+    transition: 'background 0.2s',
   }
 };
 
