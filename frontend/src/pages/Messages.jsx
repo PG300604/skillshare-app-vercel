@@ -459,7 +459,6 @@ export function Messages() {
                   </button>
                 </div>
               </div>
-            </>
             {showPollModal && (
               <div style={styles.dragOverlay}>
                 <div style={{...styles.dragContent, background: '#202c33', padding: '24px', borderRadius: '16px', minWidth: '300px'}}>
@@ -493,6 +492,7 @@ export function Messages() {
                 </div>
               </div>
             )}
+            </>
           ) : (
             <div className="font-mono" style={styles.emptyChat}>
               <div style={styles.emptyChatCircle}>
