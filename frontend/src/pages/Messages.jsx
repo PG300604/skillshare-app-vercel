@@ -15,6 +15,13 @@ export function Messages() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
+  const [fileType, setFileType] = useState('image/*');
+  const [showPollModal, setShowPollModal] = useState(false);
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [pollQuestion, setPollQuestion] = useState("");
+  const [pollOptions, setPollOptions] = useState("");
+  const [eventTitle, setEventTitle] = useState("");
+  const [eventDate, setEventDate] = useState("");
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -112,26 +119,24 @@ export function Messages() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSendMessage = async (text = newMessage, imageUrl = null) => {
-    if ((!text.trim() && !imageUrl) || !session || !activeChatId) return;
-    
-    // We send the image URL as text with a prefix to easily render it
-    const messageContent = imageUrl ? `[IMAGE]${imageUrl}` : text;
+  const handleSendMessage = async (content = newMessage, metadata = null) => {
+    if (!content.trim() && !metadata) return;
     
     const msg = {
       sender_id: session.user.id,
       receiver_id: activeChatId,
-      text: messageContent,
+      content: content,
+      metadata: metadata,
       created_at: new Date()
     };
 
     setMessages(prev => [...prev, msg]);
-    if (!imageUrl) setNewMessage("");
+    if (content === newMessage) setNewMessage("");
 
     await supabase.from('messages').insert([msg]);
   };
 
-  const handleFileUpload = async (file) => {
+  const handleFileUpload = async (file, type = 'image') => {
     if (!file || !session) return;
     setUploading(true);
     
@@ -140,28 +145,25 @@ export function Messages() {
       const fileName = `${Math.random()}.${fileExt}`;
       const filePath = `${session.user.id}/${fileName}`;
       
-      // Attempt to upload to a generic 'images' or 'profile-photos' bucket
-      // We will try 'profile-photos' as it's common in this app
-      let { error: uploadError } = await supabase.storage
-        .from('profile-photos')
+      const { error: uploadError } = await supabase.storage
+        .from('media')
         .upload(filePath, file);
         
-      if (uploadError) {
-        // Fallback bucket if first doesn't exist
-        const { error: fallbackError } = await supabase.storage
-          .from('avatars')
-          .upload(filePath, file);
-        if (fallbackError) throw fallbackError;
-      }
+      if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
-        .from('profile-photos') // or whatever bucket succeeded
+        .from('media')
         .getPublicUrl(filePath);
 
-      await handleSendMessage('', publicUrl);
+      let contentPrefix = '';
+      if (type === 'image') contentPrefix = '[IMAGE]';
+      else if (type === 'audio') contentPrefix = '[AUDIO]';
+      else contentPrefix = '[DOCUMENT]';
+
+      await handleSendMessage(`${contentPrefix}${publicUrl}`);
     } catch (error) {
-      console.error('Error uploading image:', error);
-      alert('Failed to upload image. Please make sure storage buckets are configured.');
+      console.error('Error uploading file:', error);
+      alert('Failed to upload file. Please make sure the media bucket is configured.');
     } finally {
       setUploading(false);
     }
@@ -184,17 +186,50 @@ export function Messages() {
     
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) {
-      handleFileUpload(file);
+      handleFileUpload(file, 'image');
     }
   }, [activeChatId, session]);
 
   const activeChat = conversations.find(c => c.id === activeChatId);
 
-  const renderMessageContent = (text) => {
+  const renderMessageContent = (msg) => {
+    const text = msg.content || msg.text || '';
     if (text.startsWith('[IMAGE]')) {
       const url = text.replace('[IMAGE]', '');
       return <img src={url} alt="Attachment" style={styles.messageImage} />;
     }
+    if (text.startsWith('[AUDIO]')) {
+      const url = text.replace('[AUDIO]', '');
+      return <audio controls src={url} style={{maxWidth: '220px'}} />;
+    }
+    if (text.startsWith('[DOCUMENT]')) {
+      const url = text.replace('[DOCUMENT]', '');
+      return <a href={url} target="_blank" rel="noreferrer" style={{color: 'inherit', textDecoration: 'underline'}}>📎 Download Document</a>;
+    }
+    if (text.startsWith('[STICKER]')) {
+      const url = text.replace('[STICKER]', '');
+      return <img src={url} alt="Sticker" style={{width: '100px', height: '100px'}} />;
+    }
+    
+    if (msg.metadata?.type === 'poll') {
+      return (
+        <div style={styles.pollCard}>
+          <strong>📊 {msg.metadata.question}</strong>
+          {msg.metadata.options.map((opt, i) => (
+            <div key={i} style={styles.pollOption}>{opt}</div>
+          ))}
+        </div>
+      );
+    }
+    if (msg.metadata?.type === 'event') {
+      return (
+        <div style={styles.eventCard}>
+          <strong>📅 {msg.metadata.title}</strong>
+          <div>{msg.metadata.date}</div>
+        </div>
+      );
+    }
+
     return <span style={{ wordBreak: 'break-word' }}>{text}</span>;
   };
 
@@ -319,7 +354,7 @@ export function Messages() {
                         border: isMine ? 'none' : '1px solid rgba(255, 255, 255, 0.1)'
                       }}
                     >
-                      {renderMessageContent(m.text)}
+                      {renderMessageContent(m)}
                     </motion.div>
                   );
                 })}
@@ -352,7 +387,20 @@ export function Messages() {
                           onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                           onClick={() => {
                             if (opt.id === 'photo') {
-                              fileInputRef.current?.click();
+                              setFileType('image/*');
+                              setTimeout(() => fileInputRef.current?.click(), 0);
+                            } else if (opt.id === 'doc') {
+                              setFileType('.pdf,.doc,.docx,.txt');
+                              setTimeout(() => fileInputRef.current?.click(), 0);
+                            } else if (opt.id === 'audio') {
+                              setFileType('audio/*');
+                              setTimeout(() => fileInputRef.current?.click(), 0);
+                            } else if (opt.id === 'poll') {
+                              setShowPollModal(true);
+                            } else if (opt.id === 'event') {
+                              setShowEventModal(true);
+                            } else if (opt.id === 'sticker') {
+                              handleSendMessage('[STICKER]https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMThjczNsdDBwYnc2M24zbHVrcTFrbnYwaGVweWY5cmU0cnJyeTVkZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/MDxuzRvxF39V6/giphy.gif');
                             } else {
                               alert("Coming soon!");
                             }
@@ -380,9 +428,14 @@ export function Messages() {
                     type="file"
                     ref={fileInputRef}
                     style={{ display: 'none' }}
-                    accept="image/*"
+                    accept={fileType}
                     onChange={(e) => {
-                      if (e.target.files[0]) handleFileUpload(e.target.files[0]);
+                      if (e.target.files[0]) {
+                        let type = 'doc';
+                        if (fileType.includes('image')) type = 'image';
+                        if (fileType.includes('audio')) type = 'audio';
+                        handleFileUpload(e.target.files[0], type);
+                      }
                     }}
                   />
                   <input 
@@ -407,6 +460,39 @@ export function Messages() {
                 </div>
               </div>
             </>
+            {showPollModal && (
+              <div style={styles.dragOverlay}>
+                <div style={{...styles.dragContent, background: '#202c33', padding: '24px', borderRadius: '16px', minWidth: '300px'}}>
+                  <h3 style={{margin: '0 0 16px 0'}}>Create Poll</h3>
+                  <input style={{...styles.chatInput, borderBottom: '1px solid rgba(255,255,255,0.2)'}} placeholder="Question..." value={pollQuestion} onChange={e => setPollQuestion(e.target.value)} />
+                  <input style={{...styles.chatInput, borderBottom: '1px solid rgba(255,255,255,0.2)'}} placeholder="Options (comma separated)" value={pollOptions} onChange={e => setPollOptions(e.target.value)} />
+                  <div style={{display: 'flex', gap: '12px', marginTop: '16px', width: '100%', justifyContent: 'flex-end'}}>
+                    <button style={{...styles.iconBtn, color: '#fff'}} onClick={() => setShowPollModal(false)}>Cancel</button>
+                    <button style={{...styles.iconBtn, background: 'var(--jelly-mint)', color: '#000', padding: '8px 16px', borderRadius: '16px', width: 'auto'}} onClick={() => {
+                      handleSendMessage('', { type: 'poll', question: pollQuestion, options: pollOptions.split(',').map(o=>o.trim()) });
+                      setShowPollModal(false);
+                    }}>Send</button>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {showEventModal && (
+              <div style={styles.dragOverlay}>
+                <div style={{...styles.dragContent, background: '#202c33', padding: '24px', borderRadius: '16px', minWidth: '300px'}}>
+                  <h3 style={{margin: '0 0 16px 0'}}>Create Event</h3>
+                  <input style={{...styles.chatInput, borderBottom: '1px solid rgba(255,255,255,0.2)'}} placeholder="Event Title" value={eventTitle} onChange={e => setEventTitle(e.target.value)} />
+                  <input type="datetime-local" style={{...styles.chatInput, borderBottom: '1px solid rgba(255,255,255,0.2)'}} value={eventDate} onChange={e => setEventDate(e.target.value)} />
+                  <div style={{display: 'flex', gap: '12px', marginTop: '16px', width: '100%', justifyContent: 'flex-end'}}>
+                    <button style={{...styles.iconBtn, color: '#fff'}} onClick={() => setShowEventModal(false)}>Cancel</button>
+                    <button style={{...styles.iconBtn, background: 'var(--jelly-mint)', color: '#000', padding: '8px 16px', borderRadius: '16px', width: 'auto'}} onClick={() => {
+                      handleSendMessage('', { type: 'event', title: eventTitle, date: new Date(eventDate).toLocaleString() });
+                      setShowEventModal(false);
+                    }}>Send</button>
+                  </div>
+                </div>
+              </div>
+            )}
           ) : (
             <div className="font-mono" style={styles.emptyChat}>
               <div style={styles.emptyChatCircle}>
@@ -725,6 +811,30 @@ const styles = {
     color: '#d1d7db',
     fontSize: '15px',
     transition: 'background 0.2s',
+  },
+  pollCard: {
+    background: 'rgba(0,0,0,0.2)',
+    padding: '12px',
+    borderRadius: '12px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    minWidth: '200px'
+  },
+  pollOption: {
+    background: 'rgba(255,255,255,0.1)',
+    padding: '8px 12px',
+    borderRadius: '8px',
+    fontSize: '14px'
+  },
+  eventCard: {
+    background: 'rgba(0,0,0,0.2)',
+    padding: '12px',
+    borderRadius: '12px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    minWidth: '200px'
   }
 };
 

@@ -44,7 +44,7 @@ public class SecurityConfig {
     public org.springframework.security.oauth2.jwt.JwtDecoder jwtDecoder() {
         return org.springframework.security.oauth2.jwt.NimbusJwtDecoder
                 .withJwkSetUri("https://fsvidhqsmovodluunupe.supabase.co/auth/v1/.well-known/jwks.json")
-                .jwsAlgorithm(org.springframework.security.oauth2.jose.jws.SignatureAlgorithm.ES256)
+                .jwsAlgorithm(org.springframework.security.oauth2.jose.jws.SignatureAlgorithm.RS256)
                 .build();
     }
 
