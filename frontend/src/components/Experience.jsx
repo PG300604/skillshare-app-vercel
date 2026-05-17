@@ -48,16 +48,26 @@ export function Experience() {
       const data = await response.json();
       
       if (data) {
-        const formattedDeck = data.map(u => ({
-          id: u.id,
-          name: u.fullName || u.username || "A Creator",
-          role: 'Collaborator', // Add looking_for to User model later if needed
-          location: 'Global',
-          skills: u.skills ? u.skills.map(s => s.skillName) : ['Creator'],
-          tags: u.tags || [],
-          match: 85 + Math.floor(Math.random() * 10),
-          avatar: "🧑‍💻",
-        }));
+        // Fetch already swiped user IDs
+        const { data: swiped } = await supabase
+          .from("matches")
+          .select("target_id")
+          .eq("user_id", currentSession.user.id);
+        
+        const swipedIds = swiped ? swiped.map(s => s.target_id) : [];
+
+        const formattedDeck = data
+          .filter(u => !swipedIds.includes(u.id))
+          .map(u => ({
+            id: u.id,
+            name: u.fullName || u.username || "A Creator",
+            role: 'Collaborator', // Add looking_for to User model later if needed
+            location: 'Global',
+            skills: u.skills ? u.skills.map(s => s.skillName) : ['Creator'],
+            tags: u.tags || [],
+            match: 85 + Math.floor(Math.random() * 10),
+            avatar: "🧑‍💻",
+          }));
         setDeck(formattedDeck);
       }
     } catch (err) {
@@ -70,25 +80,27 @@ export function Experience() {
   const handleSwipe = async (direction, swipedUser) => {
     setDeckIndex(i => i + 1);
     
-    if (direction === "right" && swipedUser && session) {
+    if (swipedUser && session && (direction === "right" || direction === "left")) {
       try {
-        // Insert the current user's right swipe
+        // Insert the current user's swipe (both left and right, so they don't reappear)
         await supabase
           .from("matches")
-          .insert([{ user_id: session.user.id, target_id: swipedUser.id, direction: 'right' }]);
+          .insert([{ user_id: session.user.id, target_id: swipedUser.id, direction: direction }]);
 
-        // Check for a mutual match: Did the target user already swipe right on us?
-        const { data: mutualSwipe } = await supabase
-          .from("matches")
-          .select("id")
-          .eq("user_id", swipedUser.id)
-          .eq("target_id", session.user.id)
-          .eq("direction", "right")
-          .maybeSingle();
+        if (direction === "right") {
+          // Check for a mutual match: Did the target user already swipe right on us?
+          const { data: mutualSwipe } = await supabase
+            .from("matches")
+            .select("id")
+            .eq("user_id", swipedUser.id)
+            .eq("target_id", session.user.id)
+            .eq("direction", "right")
+            .maybeSingle();
 
-        if (mutualSwipe) {
-          // It's a real match!
-          setTimeout(() => setMatchUser(swipedUser), 300); 
+          if (mutualSwipe) {
+            // It's a real match!
+            setTimeout(() => setMatchUser(swipedUser), 300); 
+          }
         }
       } catch (err) {
         console.error("Match error:", err);
