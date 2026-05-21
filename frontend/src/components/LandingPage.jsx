@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
+import { Mail } from "lucide-react";
+
+const GithubIcon = () => (
+  <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+);
+
 
 export function LandingPage() {
   const [session, setSession] = useState(null);
@@ -8,15 +14,20 @@ export function LandingPage() {
   const [password, setPassword] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState(null);
+  const [authSuccess, setAuthSuccess] = useState(null);
 
   const handleEmailAuth = async (e) => {
     e.preventDefault();
     setAuthLoading(true);
     setAuthError(null);
+    setAuthSuccess(null);
     let error;
     if (isSignUp) {
       const res = await supabase.auth.signUp({ email, password });
       error = res.error;
+      if (!error && !res.data.session) {
+        setAuthSuccess("Success! Please check your email for the confirmation link.");
+      }
     } else {
       const res = await supabase.auth.signInWithPassword({ email, password });
       error = res.error;
@@ -81,7 +92,9 @@ export function LandingPage() {
                     required 
                   />
                   {authError && <div style={{color: 'var(--red-error)', fontSize: '14px'}}>{authError}</div>}
-                  <button type="submit" disabled={authLoading} className="verge-button" style={{ width: "100%", background: "var(--jelly-mint)", color: "var(--absolute-black)" }}>
+                  {authSuccess && <div style={{color: 'var(--jelly-mint)', fontSize: '14px'}}>{authSuccess}</div>}
+                  <button type="submit" disabled={authLoading} className="verge-button" style={{ width: "100%", background: "var(--jelly-mint)", color: "var(--absolute-black)", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                    <Mail size={18} />
                     {authLoading ? "Loading..." : isSignUp ? "Sign Up with Email" : "Log In with Email"}
                   </button>
                   <div 
@@ -101,26 +114,22 @@ export function LandingPage() {
                 <button
                   onClick={() => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })}
                   className="verge-button"
-                  style={{ width: "100%" }}
+                  style={{ width: "100%", background: "#ffffff", color: "#000000", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
                 >
+                  <Mail size={18} />
                   Continue with Google
                 </button>
                 
                 <button
                   onClick={() => supabase.auth.signInWithOAuth({ provider: 'github', options: { redirectTo: window.location.origin } })}
                   className="verge-button"
-                  style={{ width: "100%", background: "#333", color: "var(--hazard-white)" }}
+                  style={{ width: "100%", background: "#333", color: "var(--hazard-white)", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
                 >
+                  <GithubIcon />
                   Continue with GitHub
                 </button>
 
-                <button
-                  onClick={() => supabase.auth.signInWithOAuth({ provider: 'linkedin_oidc', options: { redirectTo: window.location.origin } })}
-                  className="verge-button"
-                  style={{ width: "100%", background: "var(--verge-ultraviolet)", color: "var(--hazard-white)" }}
-                >
-                  Continue with LinkedIn
-                </button>
+
               </div>
             ) : (
               <div style={{color: 'var(--hazard-white)', textAlign: 'center'}}>You are already logged in!</div>

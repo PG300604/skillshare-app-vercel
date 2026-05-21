@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../supabaseClient';
-import { FiShield } from 'react-icons/fi';
+import { Shield } from 'lucide-react';
 
 export const TermsModal = ({ onAccept, userId }) => {
   const [loading, setLoading] = useState(false);
@@ -30,7 +30,7 @@ export const TermsModal = ({ onAccept, userId }) => {
       <div style={styles.modal}>
         <div style={styles.header}>
           <div style={styles.iconContainer}>
-            <FiShield size={32} color="#009de2" />
+            <Shield size={32} color="#009de2" />
           </div>
           <h2 style={styles.title}>Terms & Conditions</h2>
         </div>
