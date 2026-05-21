@@ -6,12 +6,11 @@ export function SwipeCard({ user, onSwipe }) {
   const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0, 1, 1, 1, 0]);
 
   const handleDragEnd = (event, info) => {
-    console.log("Drag ended. offset.x:", info.offset.x, "translation.x:", info.translation.x);
-    if (info.offset.x > 100) {
-      console.log("Swipe Left detected (PASS)");
+    if (!info || !info.offset) return;
+    const offsetX = info.offset.x;
+    if (offsetX > 100) {
       onSwipe("left");
-    } else if (info.offset.x < -100) {
-      console.log("Swipe Right detected (MATCH)");
+    } else if (offsetX < -100) {
       onSwipe("right");
     }
   };
