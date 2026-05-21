@@ -63,7 +63,7 @@ export function Experience() {
             name: u.fullName || u.username || "A Creator",
             role: 'Collaborator', // Add looking_for to User model later if needed
             location: 'Global',
-            skills: u.skills ? u.skills.map(s => s.skillName) : ['Creator'],
+            skills: (u.skills && u.skills.length > 0) ? u.skills.map(s => s.skillName) : ['Creator'],
             tags: u.tags || [],
             match: 85 + Math.floor(Math.random() * 10),
             avatar: "🧑‍💻",
@@ -156,8 +156,9 @@ const styles = {
   },
   cardContainer: {
     position: 'relative',
-    width: '320px',
-    height: '480px',
+    width: '90%',
+    maxWidth: '340px',
+    height: 'clamp(400px, 60vh, 480px)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

@@ -246,7 +246,7 @@ export function Messages() {
   ];
 
   return (
-    <div style={styles.container}>
+    <div className="messages-container" style={styles.container}>
       <div style={styles.glassContainer}>
         {/* Sidebar */}
         <div className={`sidebar ${activeChat ? 'active-chat' : ''}`} style={styles.sidebar}>
@@ -323,7 +323,7 @@ export function Messages() {
             <>
               <div style={styles.chatHeader}>
                 <button 
-                  className="font-mono" 
+                  className="font-mono back-button-mobile" 
                   style={styles.backBtn}
                   onClick={() => setSearchParams({})}
                 >
@@ -560,6 +560,13 @@ export function Messages() {
           display: flex;
         }
         @media (max-width: 768px) {
+          .messages-container {
+            height: calc(100vh - 60px) !important;
+            padding: 72px 12px 12px 12px !important;
+          }
+          .back-button-mobile {
+            display: block !important;
+          }
           .sidebar.active-chat {
             display: none !important;
           }

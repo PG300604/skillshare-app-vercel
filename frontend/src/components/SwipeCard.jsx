@@ -34,10 +34,28 @@ export function SwipeCard({ user, onSwipe }) {
         <h2 className="font-display" style={styles.name}>{user.name}</h2>
         <div className="font-mono" style={styles.meta}>{user.role} // {user.location}</div>
         
-        <div style={styles.skills}>
-          {user.skills.map(s => (
-            <span key={s} className="font-mono" style={styles.skillTag}>{s}</span>
-          ))}
+        <div style={styles.detailsContainer}>
+          {user.skills && user.skills.length > 0 && (
+            <div style={styles.section}>
+              <div className="font-mono" style={styles.sectionLabel}>SKILLS</div>
+              <div style={styles.tagGroup}>
+                {user.skills.map(s => (
+                  <span key={s} className="font-mono" style={styles.skillTag}>{s}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {user.tags && user.tags.length > 0 && (
+            <div style={styles.section}>
+              <div className="font-mono" style={styles.sectionLabel}>VIBE</div>
+              <div style={styles.tagGroup}>
+                {user.tags.map(t => (
+                  <span key={t} className="font-mono" style={styles.vibeTag}>{t}</span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div style={styles.matchBadge}>
@@ -61,16 +79,16 @@ const styles = {
     overflow: 'hidden',
   },
   content: {
-    padding: '32px',
+    padding: '24px',
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
   },
   avatar: {
-    fontSize: '50px',
-    marginBottom: '16px',
-    width: '80px',
-    height: '80px',
+    fontSize: '40px',
+    marginBottom: '12px',
+    width: '64px',
+    height: '64px',
     background: 'var(--hazard-white)',
     borderRadius: '50%',
     display: 'flex',
@@ -79,30 +97,60 @@ const styles = {
     border: '1px solid var(--absolute-black)',
   },
   name: {
-    fontSize: '60px',
+    fontSize: 'clamp(28px, 6.5vw, 42px)',
     color: 'var(--absolute-black)',
-    lineHeight: 0.9,
-    margin: '0 0 8px 0',
+    lineHeight: 1.0,
+    margin: '0 0 4px 0',
     textTransform: 'uppercase',
+    wordBreak: 'break-word',
+    overflowWrap: 'anywhere',
+    whiteSpace: 'normal',
   },
   meta: {
     fontSize: '11px',
     color: 'var(--absolute-black)',
-    marginBottom: '24px',
-    paddingBottom: '16px',
+    marginBottom: '16px',
+    paddingBottom: '12px',
     borderBottom: '1px solid var(--absolute-black)',
   },
-  skills: {
+  detailsContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+    marginBottom: '16px',
+    overflowY: 'auto',
+  },
+  section: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+  },
+  sectionLabel: {
+    fontSize: '9px',
+    color: 'rgba(0, 0, 0, 0.5)',
+    fontWeight: 'bold',
+    letterSpacing: '1px',
+  },
+  tagGroup: {
     display: 'flex',
     flexWrap: 'wrap',
-    gap: '8px',
+    gap: '6px',
   },
   skillTag: {
-    fontSize: '10px',
-    padding: '4px 8px',
+    fontSize: '9px',
+    padding: '3px 8px',
     border: '1px solid var(--absolute-black)',
-    borderRadius: '100px',
+    borderRadius: '4px',
     color: 'var(--absolute-black)',
+    fontWeight: '600',
+  },
+  vibeTag: {
+    fontSize: '9px',
+    padding: '3px 8px',
+    background: 'var(--absolute-black)',
+    borderRadius: '4px',
+    color: 'var(--jelly-mint)',
+    fontWeight: '600',
   },
   matchBadge: {
     marginTop: 'auto',
