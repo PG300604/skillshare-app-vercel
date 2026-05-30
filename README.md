@@ -1,246 +1,180 @@
-# SkillShare — Find Your Collaborator
+# 🚀 SkillShare — Swipe. Match. Collaborate.
 
-> A Tinder-style full-stack platform that connects people based on shared skills — swipe, match, and build together.
+<div align="center">
+  <img src="https://skillshare-app-vercel-xv9i.vercel.app/og-image.png?v=2" alt="SkillShare Social Preview Card" width="100%" style="border-radius: 12px; margin-bottom: 20px;" />
 
----
-
-## What It Does
-
-SkillShare lets users discover nearby collaborators who share their skills. Set up your profile with the skills you know (and your proficiency level), and the platform surfaces the best matches around you — ranked by skill level, filtered by distance, with a swipe UI to connect.
-
-Think of it as a dating app, but instead of romance, you're finding your next project partner, study buddy, or mentor.
-
----
-
-## Features
-
-- **Swipe-based discovery** — Tinder-style card UI to explore potential collaborators
-- **Geolocation matching** — Dynamic radius search using the Haversine formula (starts at 10km, auto-expands to 100km if needed)
-- **Proficiency-ranked results** — Matches sorted by skill level (Advanced → Intermediate → Beginner)
-- **Global fallback** — If no local matches exist, surfaces top global profiles by skill score
-- **Supabase Auth** — OAuth2 JWT-secured backend, email/social login on frontend
-- **Real-time messaging** — Chat with your matches directly in the app
-- **Profile setup flow** — Onboarding that gates the app until profile is complete
-- **Activity timeline** — Home feed showing your recent matches and activity
-- **Dockerized backend** — Multi-stage Docker build for clean, lightweight deployment
-- **Deployed on Vercel** — Frontend live at [skillshare-app-vercel.vercel.app](https://skillshare-app-vercel-xv9i.vercel.app/)
+  [![Vercel Deployment](https://img.shields.io/badge/Frontend-Vercel%20Live-3cffd0?style=for-the-badge&logo=vercel&logoColor=000000)](https://skillshare-app-vercel-xv9i.vercel.app/)
+  [![Spring Boot](https://img.shields.io/badge/Backend-Spring%20Boot%204.0-5200ff?style=for-the-badge&logo=springboot&logoColor=ffffff)](https://github.com/PG300604/skillshare-app-vercel)
+  [![Database](https://img.shields.io/badge/Database-PostgreSQL-blue?style=for-the-badge&logo=postgresql&logoColor=ffffff)](#tech-stack)
+  [![Auth](https://img.shields.io/badge/Auth-Supabase%20JWT-hazard?style=for-the-badge&logo=supabase&logoColor=3cffd0)](#tech-stack)
+</div>
 
 ---
 
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Backend | Java 17, Spring Boot 4.0 |
-| Security | Spring Security, OAuth2 Resource Server, Supabase JWT |
-| ORM | Spring Data JPA, Hibernate, Lombok |
-| Database | PostgreSQL (production), H2 (local dev) |
-| Build | Maven, multi-stage Dockerfile |
-| Frontend | React 19, Vite, React Router v7 |
-| UI/Animation | Framer Motion, React Three Fiber / Three.js |
-| Auth Client | Supabase JS SDK, Supabase Auth UI |
-| Deployment | Vercel (frontend), Docker (backend) |
+**SkillShare** is a full-stack, geolocation-aware networking platform built for creators, designers, and developers. Think of it as a professional matchmaking app — swipe through profiles, match based on complementary skills, and collaborate on your next big idea.
 
 ---
 
-## Architecture
+## 🌟 Key Features
+
+* **🤝 Tinder-Style Discover Feed** — Swipe left to pass, right to match on interactive cards powered by Framer Motion.
+* **📱 Full Mobile Responsiveness** — Mobile-first UI overhaul containing compact layouts, swipe gestures, stacked header profiles, and a sticky bottom navigation bar with iOS safe-area padding.
+* **🔒 LinkedIn In-App Browser Compatibility** — Intelligent user-agent detection that intercepts Google/GitHub OAuth blocks inside LinkedIn's built-in browser, showing an elegant step-by-step guidance modal to switch to Chrome/Safari.
+* **📍 Geolocation Matching Engine** — Dynamic radius search using the **Haversine formula** (starts at 10km, auto-expands up to 100km) to find local creators.
+* **🎯 Proficiency-Ranked Results** — Match recommendations are automatically sorted by skill expertise (Advanced → Intermediate → Beginner).
+* **💬 Real-Time Messaging** — Instant chat with matched users featuring media uploads, polls, event scheduling, and emoji stickers.
+* **✨ Open Graph / SEO Link Previews** — Configured meta tags with absolute production asset URLs and cache-busting versioning, rendering high-fidelity app previews on LinkedIn and social networks.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology | Key Purpose |
+| :--- | :--- | :--- |
+| **Frontend** | React 19, Vite, Tailwind/CSS | Fast compilation, modern interactive styling, routing |
+| **Animation** | Framer Motion, Three.js / fiber | Smooth cards swipe motion, webGL elements |
+| **Backend** | Java 17, Spring Boot 4.0 | Robust security, rest API routing, matching algorithms |
+| **Security** | Spring Security, JWT Resource Server | Secure API requests matching Supabase OAuth tokens |
+| **Auth & Chat** | Supabase JS SDK, Realtime | OAuth2 authentication provider, instant websocket chats |
+| **Database** | PostgreSQL, JPA / Hibernate | Persistent profiles, matches, and tags relationships |
+| **Hosting** | Vercel (Frontend), Docker (Backend) | Immutable edge deployments, lightweight backend image |
+
+---
+
+## 🌐 Architecture
 
 ```
-┌─────────────────────────────────────────┐
-│              React Frontend             │
-│   (Vite · React Router · Framer Motion) │
-│                                         │
-│  LandingPage → SetupProfile → Home      │
-│  Explore (Swipe) → Matches → Messages   │
-└──────────────────┬──────────────────────┘
-                   │ REST API calls
-                   │ Bearer JWT (Supabase)
-┌──────────────────▼──────────────────────┐
-│           Spring Boot Backend           │
-│                                         │
-│  SecurityConfig (OAuth2 JWT Decoder)    │
-│         │                               │
-│  MatchController  →  MatchService       │
-│         │               │               │
-│  UserRepository    Haversine Algorithm  │
-│         │          Dynamic Radius Search │
-└──────────────────┬──────────────────────┘
-                   │
-        ┌──────────▼──────────┐
-        │   PostgreSQL (prod) │
-        │   H2 (local dev)    │
-        └─────────────────────┘
-                   │
-        ┌──────────▼──────────┐
-        │   Supabase          │
-        │   (Auth + Realtime) │
-        └─────────────────────┘
+┌───────────────────────────────────────────────┐
+│                React Frontend                 │
+│    (Vite · React Router v7 · Framer Motion)   │
+│                                               │
+│    LandingPage  ──►  SetupProfile  ──► Home   │
+│    Explore (Swipe) ──► Matches ──► Messages   │
+└───────────────────────┬───────────────────────┘
+                        │
+                        │ REST API calls (Bearer JWT Token)
+                        ▼
+┌───────────────────────────────────────────────┐
+│             Spring Boot Backend               │
+│                                               │
+│    SecurityConfig (OAuth2 Supabase Decoder)   │
+│           │                                   │
+│    MatchController  ──►  MatchService         │
+│           │                   │               │
+│    UserRepository       Haversine Algorithm   │
+│    (PostgreSQL/H2)      Dynamic Radius Search │
+└───────────────────────┬───────────────────────┘
+                        │
+            ┌───────────┴───────────┐
+            ▼                       ▼
+    PostgreSQL (Production)   Supabase (Realtime + Auth)
 ```
 
 ---
 
-## The Matching Algorithm
+## 🧠 The Match Engine
 
-The core of the backend is a geolocation-aware skill matching engine in `MatchService.java`.
+The core matching algorithm is handled in Java on the backend inside `MatchService.java`:
 
-**How it works:**
-
-1. Fetches all users who share at least one skill with the current user (via JPA query)
-2. Starts with a **10km radius** and filters candidates within that range using the **Haversine formula**
-3. If fewer than 3 matches are found, the radius **auto-expands by 10km** recursively, up to a **100km cap**
-4. Results are **ranked by proficiency score** (Advanced=3, Intermediate=2, Beginner=1)
-5. If zero matches exist within 100km, the algorithm falls back to **global featured profiles** sorted by proficiency
-6. Last resort: returns 5 random users so the app never shows an empty state
-
-```java
-// Haversine formula — calculates real-world distance between two GPS coordinates
-private double calculateDistance(Double lat1, Double lon1, Double lat2, Double lon2) {
-    final int R = 6371; // Earth radius in km
-    double latDistance = Math.toRadians(lat2 - lat1);
-    double lonDistance = Math.toRadians(lon2 - lon1);
-    double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-            + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-            * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-```
+1. **Shared Skills Query**: Fetches potential candidates sharing at least one skill.
+2. **Haversine Distance calculation**: Checks physical distance in kilometers using coordinate geometry:
+   ```java
+   private double calculateDistance(Double lat1, Double lon1, Double lat2, Double lon2) {
+       final int R = 6371; // Earth radius in km
+       double latDistance = Math.toRadians(lat2 - lat1);
+       double lonDistance = Math.toRadians(lon2 - lon1);
+       double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+               + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+               * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+   }
+   ```
+3. **Dynamic Radius Expansion**: Filters candidates within **10km**. If fewer than 3 matches exist, recursively expands the search radius by 10km up to a **100km limit**.
+4. **Ranked Sorting**: Sorts profiles based on skill proficiency levels (Advanced=3, Intermediate=2, Beginner=1).
+5. **Global Fallback**: If no nearby users are found, displays top global featured profiles.
 
 ---
 
-## Project Structure
+## 📂 Project Structure
 
 ```
-skillshare-app/
+skillshare-app-vercel/
 ├── src/main/java/com/example/skillshare/
-│   ├── config/
-│   │   └── SecurityConfig.java       # CORS, OAuth2 JWT, Spring Security setup
-│   ├── controller/
-│   │   └── MatchController.java      # GET /api/matches/discover
-│   ├── model/
-│   │   ├── User.java                 # Profile entity (JPA)
-│   │   └── UserSkill.java            # Skill entity with proficiency scoring
-│   ├── repository/
-│   │   └── UserRepository.java       # JPA queries for shared-skill lookup
-│   ├── service/
-│   │   └── MatchService.java         # Haversine + dynamic radius algorithm
-│   └── SkillshareApplication.java
-├── src/main/resources/
-│   ├── application.yml               # DB config, OAuth2 JWK URI
-│   └── data.sql                      # Seed data for local dev
+│   ├── config/SecurityConfig.java     # CORS policies & Supabase token validation
+│   ├── controller/MatchController.java# Discovery endpoint provider
+│   ├── model/User.java                # JPA Entity for User Profile
+│   ├── service/MatchService.java      # Haversine distance matchmaking algorithm
+│   └── SkillshareApplication.java     # Entrypoint
 ├── frontend/
+│   ├── public/                        # Static assets (favicons, og-image.png)
 │   ├── src/
-│   │   ├── pages/                    # Home, Explore, Matches, Messages, Profile
-│   │   ├── components/               # SwipeCard, Navbar, MatchOverlay, LandingPage
-│   │   └── supabaseClient.js         # Supabase init
-│   ├── package.json
+│   │   ├── components/
+│   │   │   ├── LandingPage.jsx        # Login, In-App browser block alert, step modal
+│   │   │   ├── Navbar.jsx             # Top bar + mobile bottom bar (iOS safe areas)
+│   │   │   └── SwipeCard.jsx          # Drag-to-match profile card
+│   │   ├── pages/
+│   │   │   ├── Home.jsx               # Feed timeline (responsive flex layout)
+│   │   │   ├── Messages.jsx           # Sidebar/chat details responsive panels
+│   │   │   └── UserProfile.jsx        # Stacked mobile responsive detail sheet
+│   │   └── supabaseClient.js          # DB config initialization
+│   ├── index.html                     # SEO Meta, OG / Twitter tags, cache buster
+│   ├── vercel.json                    # Single Page App routing overrides
 │   └── vite.config.js
-├── Dockerfile                        # Multi-stage Maven + JRE build
+├── Dockerfile                         # Build package Maven runner
 └── pom.xml
 ```
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
+- **Java 17+** & **Maven 3.9+**
+- **Node.js 18+**
+- A **Supabase** Project (for database credentials & realtime sockets)
 
-- Java 17+
-- Maven 3.9+
-- Node.js 18+
-- A [Supabase](https://supabase.com) project (for auth + realtime)
-- PostgreSQL (optional for local — H2 is used by default)
+### 💻 Local Run
 
-### Backend
-
+#### 1. Start the Backend (H2 Database Seeded)
 ```bash
-# Clone the repo
+# Clone the repository
 git clone https://github.com/PG300604/skillshare-app-vercel.git
 cd skillshare-app-vercel
 
-# Run with H2 (no DB setup needed)
+# Start the Spring Boot server (uses H2 DB automatically)
 ./mvnw spring-boot:run
-
-# Backend runs at http://localhost:8080
-# H2 Console at http://localhost:8080/h2-console
+# Backend will spin up at http://localhost:8080
 ```
 
-**Environment variables (for PostgreSQL/production):**
-
-```env
-SPRING_DATASOURCE_URL=jdbc:postgresql://<host>/<db>
-SPRING_DATASOURCE_USERNAME=your_user
-SPRING_DATASOURCE_PASSWORD=your_password
-```
-
-### Frontend
-
+#### 2. Start the Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
-
-# Frontend runs at http://localhost:5173
+# Frontend dev server will start at http://localhost:5173
 ```
 
-**Required `.env` in `/frontend`:**
-
+Configure a `/frontend/.env.local` file:
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
-VITE_API_BASE_URL=http://localhost:8080
-```
-
-### Docker (Backend)
-
-```bash
-# Build the image
-docker build -t skillshare-backend .
-
-# Run with PostgreSQL
-docker run -p 8080:8080 \
-  -e SPRING_DATASOURCE_URL=jdbc:postgresql://host/db \
-  -e SPRING_DATASOURCE_USERNAME=user \
-  -e SPRING_DATASOURCE_PASSWORD=pass \
-  skillshare-backend
+VITE_THEME=warm-sunset
 ```
 
 ---
 
-## API
+## 📈 Roadmap
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/api/matches/discover` | JWT required | Returns ranked collaborator list for the current user |
-
-**Query params:** `lat` (double), `lng` (double) — optional, overrides stored coordinates.
-
-**Response:** Array of `User` objects with skills, tags, and location data.
+- [ ] **Dynamic WebSockets** for live push matches notifications.
+- [ ] **PostgreSQL Full-Text index** search for skill query optimization.
+- [ ] **Collaborator Reviews** and skill endorsements between matched users.
+- [ ] **Calendar Booker Integration** to schedule video meetings inside chats.
+- [ ] **Cross-Platform Native Client** built on React Native.
 
 ---
 
-## Deployment
+## ✒️ Author
 
-| Service | Platform |
-|---|---|
-| Frontend | [Vercel](https://vercel.com) — auto-deployed from `/frontend` |
-| Backend | Docker container (any container host) |
-| Auth + Realtime | [Supabase](https://supabase.com) |
-
-The frontend `vercel.json` handles client-side routing rewrites so React Router works correctly on Vercel.
-
----
-
-## Roadmap
-
-- [ ] Add WebSocket support for live match notifications
-- [ ] Migrate to PostgreSQL full-text search for skill queries
-- [ ] Add skill endorsements between matched users
-- [ ] Session scheduling (book a collab session with a match)
-- [ ] Mobile app (React Native)
-
----
-
-## Author
-
-**Priyanshu Ghosh** — B.Tech CSBS @ Asansol Engineering College  
-[LinkedIn](https://www.linkedin.com/in/priyanshughosh-) · [GitHub](https://github.com/PG300604)
+**Priyanshu Ghosh** — B.Tech CSBS @ Asansol Engineering College
+* [LinkedIn](https://www.linkedin.com/in/priyanshughosh-)
+* [GitHub](https://github.com/PG300604)
