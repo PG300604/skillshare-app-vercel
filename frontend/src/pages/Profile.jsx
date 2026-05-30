@@ -138,16 +138,16 @@ export function Profile() {
   const removeExperience = (i) => setExperiences(experiences.filter((_, idx) => idx !== i));
 
   return (
-    <div style={styles.container}>
+    <div className="profile-container" style={styles.container}>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} style={styles.content}>
-        <h1 className="font-display" style={styles.title}>YOUR PROFILE</h1>
+        <h1 className="font-display profile-title" style={styles.title}>YOUR PROFILE</h1>
         
-        <div style={styles.formCard}>
+        <div className="profile-form-card" style={styles.formCard}>
           {loading ? (
              <div className="font-mono" style={{color: 'var(--hazard-white)'}}>LOADING...</div>
           ) : (
             <>
-              <div style={styles.avatarSection}>
+              <div className="profile-avatar-section" style={styles.avatarSection}>
                 {avatarUrl ? (
                   <img src={avatarUrl} alt="Avatar" style={{...styles.avatarPlaceholder, objectFit: 'cover'}} />
                 ) : (
@@ -225,6 +225,25 @@ export function Profile() {
           )}
         </div>
       </motion.div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .profile-container {
+            padding: 88px 12px 100px 12px !important;
+          }
+          .profile-title {
+            font-size: clamp(36px, 10vw, 56px) !important;
+            margin-bottom: 24px !important;
+          }
+          .profile-form-card {
+            padding: 16px !important;
+          }
+          .profile-avatar-section {
+            align-items: center !important;
+            width: 100% !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

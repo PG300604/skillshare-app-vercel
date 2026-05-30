@@ -69,19 +69,19 @@ export function UserProfile() {
   const isMe = sessionUser?.id === profile.id;
 
   return (
-    <div style={styles.container}>
+    <div className="user-profile-container" style={styles.container}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} style={styles.content}>
         
         {/* Header Section */}
-        <div style={styles.headerCard}>
-          <div style={styles.avatarRow}>
+        <div className="user-profile-header-card" style={styles.headerCard}>
+          <div className="user-profile-avatar-row" style={styles.avatarRow}>
             {profile.avatar_url ? (
-              <img src={profile.avatar_url} alt="avatar" style={styles.avatar} />
+              <img src={profile.avatar_url} alt="avatar" className="user-profile-avatar" style={styles.avatar} />
             ) : (
-              <div style={{...styles.avatar, background: 'var(--jelly-mint)'}} />
+              <div className="user-profile-avatar" style={{...styles.avatar, background: 'var(--jelly-mint)'}} />
             )}
-            <div style={styles.nameBlock}>
-              <h1 className="font-display" style={styles.name}>{profile.full_name || profile.name || 'Anonymous'}</h1>
+            <div className="user-profile-name-block" style={styles.nameBlock}>
+              <h1 className="font-display user-profile-name" style={styles.name}>{profile.full_name || profile.name || 'Anonymous'}</h1>
               <div className="font-mono" style={styles.username}>@{profile.username || 'unknown'}</div>
               {profile.looking_for && (
                 <div style={styles.lookingFor}>Looking for: <span style={{color: 'var(--hazard-white)'}}>{profile.looking_for}</span></div>
@@ -124,7 +124,7 @@ export function UserProfile() {
           )}
         </div>
 
-        <div style={styles.columns}>
+        <div className="user-profile-columns" style={styles.columns}>
           {/* Left Column */}
           <div style={styles.leftCol}>
             {/* Skills */}
@@ -181,6 +181,40 @@ export function UserProfile() {
         </div>
 
       </motion.div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .user-profile-container {
+            padding: 88px 12px 100px 12px !important;
+          }
+          .user-profile-header-card {
+            padding: 24px 16px !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+          }
+          .user-profile-avatar-row {
+            flex-direction: column !important;
+            gap: 16px !important;
+            align-items: center !important;
+            width: 100% !important;
+          }
+          .user-profile-avatar {
+            width: 90px !important;
+            height: 90px !important;
+          }
+          .user-profile-name-block {
+            align-items: center !important;
+          }
+          .user-profile-name {
+            font-size: clamp(32px, 8vw, 44px) !important;
+            text-align: center !important;
+          }
+          .user-profile-columns {
+            gap: 16px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

@@ -55,7 +55,7 @@ export function Matches() {
   }, []);
 
   return (
-    <div style={styles.container}>
+    <div className="timeline-container" style={styles.container}>
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -63,12 +63,12 @@ export function Matches() {
         style={styles.content}
       >
         <div style={styles.feedHeader}>
-          <h1 className="font-display" style={styles.feedTitle}>YOUR MATCHES</h1>
+          <h1 className="font-display timeline-title" style={styles.feedTitle}>YOUR MATCHES</h1>
           <div className="font-sans-light-caps" style={styles.feedSubtitle}>Collaborators Ready</div>
         </div>
 
-        <div style={styles.storyStream}>
-          <div style={styles.verticalRail} />
+        <div className="timeline-stream" style={styles.storyStream}>
+          <div className="timeline-rail" style={styles.verticalRail} />
           
           {loading ? (
              <div className="font-mono" style={{color: 'var(--hazard-white)', paddingLeft: '32px'}}>LOADING...</div>
@@ -80,12 +80,13 @@ export function Matches() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1, duration: 0.3, ease: "easeOut" }}
+              className="timeline-item"
               style={styles.streamItemContainer}
             >
-              <div className="font-mono" style={styles.timestamp}>{match.time}</div>
-              <div style={styles.marker} />
+              <div className="font-mono timeline-timestamp" style={styles.timestamp}>{match.time}</div>
+              <div className="timeline-marker" style={styles.marker} />
               
-              <div style={{
+              <div className="timeline-card" style={{
                 ...styles.storyCard,
                 background: match.color || 'var(--canvas-black)',
                 border: match.color ? 'none' : '1px solid var(--hazard-white)',
@@ -96,7 +97,7 @@ export function Matches() {
                 }}>
                   {match.kicker}
                 </div>
-                <h3 className="font-sans" style={{
+                <h3 className="font-sans card-headline" style={{
                   ...styles.headline,
                   color: 'var(--hazard-white)'
                 }}>
@@ -122,6 +123,46 @@ export function Matches() {
           ))}
         </div>
       </motion.div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .timeline-container {
+            padding: 88px 16px 100px 16px !important;
+          }
+          .timeline-title {
+            font-size: clamp(36px, 10vw, 56px) !important;
+          }
+          .timeline-stream {
+            padding-left: 24px !important;
+          }
+          .timeline-rail {
+            left: 6px !important;
+          }
+          .timeline-item {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            margin-bottom: 24px !important;
+          }
+          .timeline-timestamp {
+            position: static !important;
+            width: auto !important;
+            text-align: left !important;
+            margin-bottom: 8px !important;
+            font-size: 12px !important;
+            padding-left: 0 !important;
+          }
+          .timeline-marker {
+            left: 6px !important;
+            top: 6px !important;
+          }
+          .timeline-card {
+            padding: 16px 20px !important;
+          }
+          .card-headline {
+            font-size: 18px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

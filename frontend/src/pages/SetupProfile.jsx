@@ -132,17 +132,17 @@ export function SetupProfile() {
 
   return (
     <div style={styles.root}>
-      <div style={styles.container}>
+      <div className="setup-container" style={styles.container}>
         <div style={styles.header}>
-          <div className="font-display" style={{color: 'var(--jelly-mint)', fontSize: '24px'}}>SETUP YOUR PROFILE</div>
+          <div className="font-display setup-header-title" style={{color: 'var(--jelly-mint)', fontSize: '24px'}}>SETUP YOUR PROFILE</div>
           <div className="font-mono" style={{color: 'var(--secondary-text)'}}>STEP {step} OF 4</div>
         </div>
 
-        <div style={styles.card}>
+        <div className="setup-card" style={styles.card}>
           <AnimatePresence mode="wait">
             {step === 1 && (
               <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} style={styles.stepContainer}>
-                <h2 className="font-display" style={styles.stepTitle}>WHO ARE YOU?</h2>
+                <h2 className="font-display setup-step-title" style={styles.stepTitle}>WHO ARE YOU?</h2>
                 <div style={styles.inputGroup}>
                   <label style={styles.label}>FULL NAME</label>
                   <input style={styles.input} value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} placeholder="Jane Doe" />
@@ -156,7 +156,7 @@ export function SetupProfile() {
 
             {step === 2 && (
               <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} style={styles.stepContainer}>
-                <h2 className="font-display" style={styles.stepTitle}>WHERE ARE YOU?</h2>
+                <h2 className="font-display setup-step-title" style={styles.stepTitle}>WHERE ARE YOU?</h2>
                 <p style={{color: 'var(--secondary-text)', marginTop: 0}}>Used for local matching.</p>
                 <div style={styles.inputGroup}>
                   <label style={styles.label}>CITY</label>
@@ -167,8 +167,8 @@ export function SetupProfile() {
 
             {step === 3 && (
               <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} style={styles.stepContainer}>
-                <h2 className="font-display" style={styles.stepTitle}>YOUR SKILLS</h2>
-                <div style={{display: 'flex', gap: '8px', marginBottom: '16px'}}>
+                <h2 className="font-display setup-step-title" style={styles.stepTitle}>YOUR SKILLS</h2>
+                <div className="setup-adder-row" style={{display: 'flex', gap: '8px', marginBottom: '16px'}}>
                   <input style={{...styles.input, flex: 1}} value={currentSkill} onChange={e => setCurrentSkill(e.target.value)} placeholder="e.g. React, Java, UI Design" />
                   <select style={styles.input} value={currentProficiency} onChange={e => setCurrentProficiency(e.target.value)}>
                     <option>Beginner</option>
@@ -191,8 +191,8 @@ export function SetupProfile() {
 
             {step === 4 && (
               <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} style={styles.stepContainer}>
-                <h2 className="font-display" style={styles.stepTitle}>YOUR VIBE</h2>
-                <div style={{display: 'flex', gap: '8px', marginBottom: '16px'}}>
+                <h2 className="font-display setup-step-title" style={styles.stepTitle}>YOUR VIBE</h2>
+                <div className="setup-adder-row" style={{display: 'flex', gap: '8px', marginBottom: '16px'}}>
                   <input style={{...styles.input, flex: 1}} value={currentTag} onChange={e => setCurrentTag(e.target.value)} placeholder="e.g. Night Owl, Coffee Addict" />
                   <button className="verge-button" style={{padding: '0 24px'}} onClick={addTag}>ADD</button>
                 </div>
@@ -224,6 +224,34 @@ export function SetupProfile() {
           )}
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .setup-container {
+            padding: 16px !important;
+            gap: 16px !important;
+          }
+          .setup-header-title {
+            font-size: 18px !important;
+          }
+          .setup-card {
+            padding: 24px 16px !important;
+            min-height: 380px !important;
+          }
+          .setup-step-title {
+            font-size: 28px !important;
+          }
+          .setup-adder-row {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 12px !important;
+          }
+          .setup-adder-row button {
+            width: 100% !important;
+            padding: 12px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
