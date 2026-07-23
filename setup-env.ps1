@@ -1,12 +1,25 @@
 # setup-env.ps1
 # Secure Backup and Restore for SkillShare Environment Credentials
 
+param (
+    [string]$RawContent
+)
+
 $BackupPath = "$Home\.skillshare-env-backup"
 $EnvFilePath = "$PSScriptRoot\frontend\.env.local"
 
 # Ensure the frontend folder exists
 if (!(Test-Path "$PSScriptRoot\frontend")) {
     New-Item -ItemType Directory -Force -Path "$PSScriptRoot\frontend" | Out-Null
+}
+
+# If RawContent parameter is passed, write it directly
+if (![string]::IsNullOrEmpty($RawContent)) {
+    Write-Host "[INFO] Writing provided raw content to environment and backup..." -ForegroundColor Cyan
+    Set-Content -Path $EnvFilePath -Value $RawContent -Force
+    Set-Content -Path $BackupPath -Value $RawContent -Force
+    Write-Host "[SUCCESS] Setup and backup completed successfully!" -ForegroundColor Green
+    exit
 }
 
 if (Test-Path $BackupPath) {
