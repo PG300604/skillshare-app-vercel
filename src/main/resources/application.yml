@@ -1,3 +1,6 @@
+server:
+  port: ${PORT:8080}
+
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:skillshare;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
@@ -16,7 +19,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          secret: ${SUPABASE_JWT_SECRET}
+          secret: ${SUPABASE_JWT_SECRET:}
 
 logging:
   level:
